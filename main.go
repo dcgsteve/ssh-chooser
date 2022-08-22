@@ -13,11 +13,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-// type Menu struct {
-// 	Label string
-// 	Items []*fyne.MenuItem
-// }
-
 var a fyne.App
 
 func main() {
