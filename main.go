@@ -13,17 +13,17 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-type Menu struct {
-	Label string
-	Items []*fyne.MenuItem
-}
+// type Menu struct {
+// 	Label string
+// 	Items []*fyne.MenuItem
+// }
 
 var a fyne.App
 
 func main() {
 
 	a = app.New()
-	w := a.NewWindow("Click a Host!")
+	w := a.NewWindow("Click a Host")
 
 	// List box with host details
 	hosts := getHosts()
@@ -40,9 +40,7 @@ func main() {
 		})
 
 	lstHosts.OnSelected = func(id widget.ListItemID) {
-
-		// c := cmd.NewCmd("bash", "-c", "ssh", hosts[id])
-		c := exec.Command("bash", "-c", "echo", "hello")
+		c := exec.Command("cmd", "/C", "wt.exe", "ssh", hosts[id])
 		err := c.Start()
 		if err != nil {
 			showError(err)
@@ -66,11 +64,11 @@ func main() {
 func getHosts() []string {
 
 	var hosts []string
-	var configFile string = "/home/steve/.ssh/config"
+	var configFile string = "c:\\users\\me\\.ssh\\config"
 
 	config, err := os.Open(configFile)
 	if err != nil {
-		fmt.Printf("Could not open config file [%s]: %s", configFile, err)
+		showError(err)
 	}
 	defer config.Close()
 	s := bufio.NewScanner(config)
@@ -80,7 +78,6 @@ func getHosts() []string {
 				h := strings.TrimSpace(s.Text()[5:])
 				if h != "*" && len(h) > 0 {
 					hosts = append(hosts, h)
-					fmt.Printf("Found host: %s\n", h)
 				}
 			}
 		}
@@ -90,10 +87,9 @@ func getHosts() []string {
 }
 
 func showError(e error) {
-
+	// Build window
 	w := a.NewWindow("Error")
 	lbl := widget.NewLabel(fmt.Sprintf("An error has occurred - see below for details:\n\n%s", e))
-	// Build window
 	w.SetContent(
 		container.NewMax(
 			lbl,
@@ -103,5 +99,4 @@ func showError(e error) {
 
 	// Start GUI
 	w.Show()
-
 }
