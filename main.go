@@ -7,53 +7,52 @@ import (
 	"os/exec"
 	"strings"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
+	"fyne.io/systray"
+	"github.com/gen2brain/beeep"
 )
 
-var a fyne.App
-
 func main() {
+	systray.Run(onReady, onExit)
+}
 
-	a = app.New()
-	w := a.NewWindow("Click a Host")
+func onReady() {
 
-	// List box with host details
-	hosts := getHosts()
+	systray.SetTitle("SSH Chooser")
+	systray.SetIcon(getIcon("assets/ssh.ico"))
 
-	lstHosts := widget.NewList(
-		func() int {
-			return len(hosts)
-		},
-		func() fyne.CanvasObject {
-			return widget.NewLabel("example-length")
-		},
-		func(i widget.ListItemID, o fyne.CanvasObject) {
-			o.(*widget.Label).SetText(hosts[i])
-		})
-
-	lstHosts.OnSelected = func(id widget.ListItemID) {
-		c := exec.Command("cmd", "/C", "wt.exe", "ssh", hosts[id])
-		err := c.Start()
-		if err != nil {
-			showError(err)
-		}
-		lstHosts.UnselectAll()
+	// Add hosts
+	for _, host := range getHosts() {
+		mItem := systray.AddMenuItem(host, "Connect to "+host)
+		go func(host string) {
+			<-mItem.ClickedCh
+			displayMessage(host)
+			c := exec.Command("cmd", "/C", "wt.exe", "ssh", host)
+			e := c.Start()
+			if e != nil {
+				fmt.Printf("Error %v", e)
+			}
+		}(host)
 	}
 
-	// Build window
-	w.SetContent(
-		container.NewMax(
-			lstHosts,
-		),
-	)
-	w.Resize(fyne.NewSize(300, 500))
+	// Add exit
+	systray.AddSeparator()
+	mQuit := systray.AddMenuItem("Quit", "Quit SSH chooser")
+	go func() {
+		<-mQuit.ClickedCh
+		systray.Quit()
+	}()
+}
 
-	// Start GUI
-	w.ShowAndRun()
+func onExit() {
+	// Cleaning stuff here.
+}
 
+func getIcon(s string) []byte {
+	b, err := os.ReadFile(s)
+	if err != nil {
+		fmt.Print(err)
+	}
+	return b
 }
 
 func getHosts() []string {
@@ -63,7 +62,7 @@ func getHosts() []string {
 
 	config, err := os.Open(configFile)
 	if err != nil {
-		showError(err)
+		os.Exit(1)
 	}
 	defer config.Close()
 	s := bufio.NewScanner(config)
@@ -81,17 +80,9 @@ func getHosts() []string {
 	return hosts
 }
 
-func showError(e error) {
-	// Build window
-	w := a.NewWindow("Error")
-	lbl := widget.NewLabel(fmt.Sprintf("An error has occurred - see below for details:\n\n%s", e))
-	w.SetContent(
-		container.NewMax(
-			lbl,
-		),
-	)
-	w.Resize(fyne.NewSize(200, 100))
-
-	// Start GUI
-	w.Show()
+func displayMessage(msg string) {
+	err := beeep.Notify("SSH Chooser", msg, "assets/ssh.png")
+	if err != nil {
+		panic(err)
+	}
 }
