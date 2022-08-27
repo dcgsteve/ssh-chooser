@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"sort"
 	"strings"
 
 	"fyne.io/systray"
@@ -58,8 +60,8 @@ func getIcon(s string) []byte {
 func getHosts() []string {
 
 	var hosts []string
-	var configFile string = "c:\\users\\me\\.ssh\\config"
 
+	configFile := filepath.Join(fmt.Sprintf("%s%s", os.Getenv("USERPROFILE"), "\\.ssh\\config"))
 	config, err := os.Open(configFile)
 	if err != nil {
 		os.Exit(1)
@@ -76,6 +78,8 @@ func getHosts() []string {
 			}
 		}
 	}
+
+	sort.Strings(hosts)
 
 	return hosts
 }
