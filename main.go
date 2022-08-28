@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,6 +13,9 @@ import (
 	"github.com/gen2brain/beeep"
 )
 
+//go:embed winres/chooser.ico
+var ico []byte
+
 func main() {
 	systray.Run(onReady, onExit)
 }
@@ -19,7 +23,7 @@ func main() {
 func onReady() {
 
 	systray.SetTitle("SSH Chooser")
-	systray.SetIcon(getIcon("winres/ssh-chooser.ico"))
+	systray.SetTemplateIcon(ico, ico)
 
 	// Add hosts
 	for _, host := range getHosts() {
@@ -46,13 +50,13 @@ func onExit() {
 	// Cleaning stuff here.
 }
 
-func getIcon(s string) []byte {
-	b, err := os.ReadFile(s)
-	if err != nil {
-		fmt.Print(err)
-	}
-	return b
-}
+// func getIcon(s string) []byte {
+// 	b, err := os.ReadFile(s)
+// 	if err != nil {
+// 		fmt.Print(err)
+// 	}
+// 	return b
+// }
 
 func getHosts() []string {
 
