@@ -20,7 +20,7 @@ func main() {
 func onReady() {
 
 	systray.SetTitle("SSH Chooser")
-	systray.SetIcon(getIcon("winres/ssh.ico"))
+	systray.SetIcon(getIcon("winres/ssh-chooser.ico"))
 
 	// Add hosts
 	for _, host := range getHosts() {
