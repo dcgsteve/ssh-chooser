@@ -1,4 +1,4 @@
-![Application Logo](winres/coding-small.png) ***SSH Chooser***
+![Application Logo](winres/chooser-small.png) ***SSH Chooser***
 ___
 
 ## info
@@ -9,7 +9,8 @@ Clicking on a host opens a Windows Terminal SSH connection to the host. If you n
 
 ## requirements
 
-- Windows Terminal (`wt.exe`) must be somewhere in your Windows path
+- Windows Terminal must be installed in the default location
+I.E. `wt.exe` must be in the `Microsoft\WindowsApps\` subfolder off your user's local application path. For example: `C:\Users\me\AppData\Local\Microsoft\WindowsApps\wt.exe`
 
 ## attributions
 
