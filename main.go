@@ -20,7 +20,7 @@ func main() {
 func onReady() {
 
 	systray.SetTitle("SSH Chooser")
-	systray.SetIcon(getIcon("assets/ssh.ico"))
+	systray.SetIcon(getIcon("winres/ssh.ico"))
 
 	// Add hosts
 	for _, host := range getHosts() {
@@ -30,7 +30,7 @@ func onReady() {
 			c := exec.Command("cmd", "/C", "wt.exe", "ssh", host)
 			e := c.Start()
 			if e != nil {
-				fmt.Printf("Error %v", e)
+				displayMessage(e.Error())
 			}
 		}(host)
 	}
