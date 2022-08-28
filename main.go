@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -27,8 +26,7 @@ func onReady() {
 		mItem := systray.AddMenuItem(host, "Connect to "+host)
 		go func(host string) {
 			<-mItem.ClickedCh
-			c := exec.Command("cmd", "/C", "wt.exe", "ssh", host)
-			e := c.Start()
+			e := triggerTerminal(host)
 			if e != nil {
 				displayMessage(e.Error())
 			}
@@ -88,4 +86,15 @@ func displayMessage(msg string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func triggerTerminal(host string) error {
+	tPath := filepath.Join(os.Getenv("LOCALAPPDATA"), "Microsoft\\WindowsApps\\wt.exe")
+	procAttr := new(os.ProcAttr)
+	procAttr.Files = []*os.File{nil, nil, nil}
+
+	args := []string{"ssh", host}
+	_, e := os.StartProcess(tPath, append([]string{tPath}, args...), procAttr)
+
+	return e
 }
