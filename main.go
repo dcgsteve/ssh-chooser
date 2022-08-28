@@ -27,7 +27,6 @@ func onReady() {
 		mItem := systray.AddMenuItem(host, "Connect to "+host)
 		go func(host string) {
 			<-mItem.ClickedCh
-			displayMessage(host)
 			c := exec.Command("cmd", "/C", "wt.exe", "ssh", host)
 			e := c.Start()
 			if e != nil {
